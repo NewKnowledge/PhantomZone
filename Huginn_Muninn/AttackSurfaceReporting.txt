@@ -1,0 +1,33 @@
+OUTLINE
+
+Objectives: Create a daily monitoring/assessment tool for Threat Intel teams to quickly track updates or relevant developmentsfor a given client's attack surface.
+Product should facilitate threat analysts identifying several things at a glance
+-What, if anything, changed in last 12 hrs.
+-Signs of coordination/cross-platform changes
+-When closer human attention is required, and where.
+
+
+Critical Alerting
+-Do 3+ signals all spike X amount with each other?
+-Triage events, flag when human attention required
+
+Wikipedia:
+-Page views
+-No. of edits made
+-NLP of proposed edits
+
+YouTube
+-Tracked threat actor channels
+-Views per day
+-No. of comments
+-No. of videos uploaded per day, by client space (divide out distinct IP)
+
+BuzzSumo
+-Articles per day
+-Engagements on content
+-YT content sharing (off-platform visibility)
+
+Mentions (via Snowflake)
+-Reddit
+-4chan
+-Twitter
