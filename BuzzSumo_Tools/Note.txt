@@ -1,0 +1,1 @@
+Folder for buzzsumo toolkit R package.
