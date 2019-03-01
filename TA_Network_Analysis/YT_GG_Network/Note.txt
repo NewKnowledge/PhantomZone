@@ -1,0 +1,4 @@
+REMOVE: add in the analysis of the youtube threat actor network
+-SNA analysis of channels, relationship with alt-right accounts
+-Estimate population size
+-Discord channels identified
