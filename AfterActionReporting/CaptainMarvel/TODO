@@ -1,0 +1,32 @@
+After Action Reporting
+
+
+After Action report for Captain Marvel review manipulation.
+
+##Timeline of events: 
+Feb 5: Brie Larson gives InStyle interview
+
+Feb 7:  Brie Larson makes statement about diversity of her press tour 
+https://www.marieclaire.co.uk/entertainment/tv-and-film/brie-larson-641750
+
+Feb 22:  HuffPo reports on trolling campaign targeting Captain Marvel reviews
+https://www.huffpost.com/entry/disturbing-captain-marvel-reviews-removed-from-rotten-tomatoes_n_5c6c77b8e4b0e37a1ed27cdd 
+
+Feb 26:  Rotten Tomatoes removes “want to see” score after broad manipulation efforts.
+https://www.engadget.com/2019/02/26/rotten-tomatoes-trolls-audience-scores/  
+
+
+##Analysis:
+1. Correlation between discussion of the movie, Larson on 4chan/YouTube channels and review scores
+2. Life cycle of the issue on Youtube: did it escalate on 4chan first?  Youtube? Twitter?  Etc
+3. Audience threat actor network on YT: we identified a network of channels that are highly focused on Disney IP and are persistent threat actors in the space, analysis of audience overlap with broader alt-right network
+4. Discord channels identified
+
+##Findings:
+1.  The Youtube influencer network identified also will target Star Wars, Toy Story, etc to promote their ideologies: all are targets of opportunity
+2.  The audience that follows these influencers appears to be highly overlapped with conventional alt-right influencers on the platform.
+3.  Youtube channels engaging with the "white men" issue appear to have been in a feedback loop with the review manipulation (unlikely they need to directly issue a CTA, audiences knows what to do already)
+ (See YT analysis repo for additional data)
+4.  Footprint of activities also exists on Reddit - NEED MORE ANALYSIS HERE
+ 
+Threat actor pathway for future Disney movies is likely 4chan/8chan -> Youtube -> Manifestations of CTA
