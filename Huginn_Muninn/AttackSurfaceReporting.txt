@@ -20,6 +20,11 @@ Critical Alerting
 -Do 3+ signals all spike X amount with each other?
 -Triage events, flag when human attention required
 
+Tips/Campaigns:
+-Tips per day (velocity)
+-Pie chart: threat actors at work by class/platform
+-Table of tips/campaigns
+
 Wikipedia:
 -Page views
 -No. of edits made
