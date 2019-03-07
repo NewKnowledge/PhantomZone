@@ -1,0 +1,232 @@
+library(httr)
+library(jsonlite)
+library(tidyr)
+
+###############################
+#Most Shared API - GetArticles
+###############################
+getMostShared = function(q, num_days, lang, art_type){
+  if(missing(q)){
+    stop("Please enter a search term")
+  }
+  
+  if(missing(num_days)){
+    stop("Please enter the number of days for which you wish to search")
+  }
+  
+  if(missing(art_type)){
+    stop("Please enter the type of article you wish to search")
+  }
+  
+  if(missing(lang)){
+    stop("Please enter the language for content which you wish to search")
+  }
+
+  q = gsub(" ", "+", q, fixed = TRUE)
+  call1 <- paste0("http://api.buzzsumo.com/search/articles.json?q=",q,"&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&num_days=",num_days,"&num_results=100&article_type=",art_type,"&language=", lang,"&page=0", sep="")
+  get_call <- GET(call1)
+  get_content = content(get_call, "text")
+  get_content_json = fromJSON(get_content, flatten = TRUE)
+  total_pages = get_content_json$total_pages
+  temp = as.data.frame(get_content_json$results)
+  if (total_pages == 0){
+    print("No Results")
+  } else {
+  #Loop to download multiple pages
+      if (total_pages>1) { 
+        #menu(c("Yes","No"), title = paste0("Results contain ",total_pages," total pages of results.  Proceed?"))
+     for(i in 1:total_pages){
+       cat('Downloading page', i, 'of', total_pages,'\n')
+       call1 <- paste0("http://api.buzzsumo.com/search/articles.json?q=",q,"&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&num_days=",num_days,"&num_results=100&article_type=",art_type,"&language=", lang,"&page=",i, sep="")
+       get_call <- GET(call1)
+        get_content = content(get_call, "text")
+        get_content_json = fromJSON(get_content, flatten = TRUE)
+        res = as.data.frame(get_content_json$results)
+        temp = plyr::rbind.fill(temp, res)}
+     }
+  }
+  if (nrow(temp)>0){
+  temp$published_date = as.Date(as.POSIXct(temp$published_date, origin="1970-01-01"), format = "%d/%m/%Y")
+  temp = temp[ , -which(names(temp) %in% c("article_amplifiers","article_types"))]
+  temp=unique(temp)}
+  temp
+}
+
+#Example
+#getShared_test = getMostShared(q="captain marvel",  lang="en", num_days = "10", art_type = "general_article,video,list,how_to_article,what_post,why_post,infographic")
+
+###############################
+#API Needs Calc: Get Shared
+###############################
+calcArticleSharers = function(articles){
+  output=data.frame()
+  for(i in 1:length(articles)){
+    cat('Downloading shares for article', i, 'of', length(articles),'\n')
+    call1 <- paste0("http://api.buzzsumo.com/search/shares.json?article_id=",articles[i],"&result_type=avg_retweets&page=0&person_types=regular%20people&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&page=0", sep="")
+    get_call <- GET(call1)
+    get_content = content(get_call, "text")
+    get_content_json = fromJSON(get_content, flatten = TRUE)
+    total_pages = get_content_json$total_pages
+    temp = cbind(articles[i],total_pages)
+    output = rbind(output, temp)
+
+  }
+  output$total_pages = as.numeric(as.character(output$total_pages))
+  API_total <- sum(output$total_pages)
+  colnames(output) = c("Article_ID", "Result_Pages")
+  print(paste0("This query will require ",API_total," API calls to complete", sep=""))
+  output
+}
+
+#calcArticleSharers_Test = calcArticleSharers(articles)
+
+###############################
+#API Needs Calc: Get Articles
+###############################
+calcMostShared = function(q, num_days, lang, art_type){
+  if(missing(q)){
+    stop("Please enter a search term")
+  }
+  
+  if(missing(num_days)){
+    stop("Please enter the number of days for which you wish to search")
+  }
+  
+  if(missing(art_type)){
+    stop("Please enter the type of article you wish to search")
+  }
+  
+  if(missing(lang)){
+    stop("Please enter the language for content which you wish to search")
+  }
+  
+  q = gsub(" ", "+", q, fixed = TRUE)
+  output=data.frame()
+  call1 <- paste0("http://api.buzzsumo.com/search/articles.json?q=",q,"&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&num_days=",num_days,"&num_results=100&article_type=",art_type,"&language=", lang,"&page=0", sep="")
+  get_call <- GET(call1)
+  get_content = content(get_call, "text")
+  get_content_json = fromJSON(get_content, flatten = TRUE)
+  total_pages = get_content_json$total_pages
+  temp = cbind(q,lang,num_days,total_pages)
+  output = rbind(output, temp)
+    
+  colnames(output) = c("SearchTerm","Language","Num_Days", "Result_Pages")
+  print(paste0("This query will require ",output$Result_Pages," API calls to complete", sep=""))
+  output
+  
+}
+
+#Example
+#calcMostShared_Test = calcMostShared(q="talcum powder",  lang="en", num_days = "180", art_type = "general_article,video")
+
+
+
+
+###############################
+#Shared API - Who shared articles on Twitter
+###############################
+getArticleSharers = function(articles){
+  output=data.frame()
+  for(i in 1:length(articles)){
+    tryCatch({
+    cat('Downloading shares for article', i, 'of', length(articles),'\n')
+    call1 <- paste0("http://api.buzzsumo.com/search/shares.json?article_id=",articles[i],"&result_type=avg_retweets&page=0&person_types=regular%20people&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&page=0", sep="")
+    get_call <- GET(call1)
+    get_content = content(get_call, "text")
+    get_content_json = fromJSON(get_content, flatten = TRUE)
+    total_pages = get_content_json$total_pages
+    temp = data.frame()}, error=function(e){})
+    #Loop to download multiple pages
+    if (total_pages>1) { 
+        for(x in 1:total_pages){
+          cat('Downloading page', x, 'of', total_pages,'\n')
+          call1 <-  paste0("http://api.buzzsumo.com/search/shares.json?article_id=",articles[i],"&result_type=avg_retweets&page=0&person_types=regular%20people&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&page=",x, sep="")
+          get_call <- GET(call1)
+          get_content = content(get_call, "text")
+          get_content_json = fromJSON(get_content, flatten = TRUE)
+          res = as.data.frame(get_content_json$results)
+          #res$Article_ID = articles[i]
+          temp = plyr::rbind.fill(temp, res)
+          temp$Article_ID = ifelse(nrow(temp)>0,articles[i],NULL)
+        }
+    }
+    #temp$Article_ID = articles[i]
+    output=plyr::rbind.fill(output, temp)
+  }
+  output
+}
+
+
+#Example
+#getArticleSharers_test = getArticleSharers(articles)
+
+###############################
+#Linked API - Last 100 articles linked by Twitter Account
+###############################
+
+getLinks = function(accounts){
+  output=data.frame()
+  for(i in 1:length(accounts)){
+    tryCatch({
+    cat('Downloading shares for account', i, 'of', length(accounts),'\n')
+    call1 <- paste0("http://api.buzzsumo.com/search/shared_links.json?username=",accounts[i],"&details=0&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8", sep="")
+    get_call <- GET(call1)
+    get_content = content(get_call, "text")
+    get_content_json = fromJSON(get_content, flatten = TRUE)
+    get_content_json$AccountID = accounts[i]
+    output=plyr::rbind.fill(output, get_content_json)}, error=function(e){})
+  }
+  output
+}
+
+#Example
+#getLinks_test = getLinks(accounts)
+
+###############################
+#Influencers API
+###############################
+getInfluencers = function(q, person_type){
+  if(missing(q)){
+    stop("Please enter a search term")
+  }
+  
+  if(missing(person_type)){
+    stop("Please enter the type of infliuencer for which you wish to search")
+  }
+  
+  
+  q = gsub(" ", "+", q, fixed = TRUE)
+  person_type = gsub(" ", "+", person_type, fixed = TRUE)
+  call1 <- paste0("http://api.buzzsumo.com/search/influencers.json?q=",q,"&persontypes=",person_type,"&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&page=0", sep="")
+  get_call <- GET(call1)
+  get_content = content(get_call, "text")
+  get_content_json = fromJSON(get_content, flatten = TRUE)
+  total_pages = get_content_json$total_pages
+  content = get_content_json$results
+  temp = as.data.frame(get_content_json$results)
+  if (total_pages>1) { 
+  #Loop to download multiple pages
+    #menu(c("Yes","No"), title = paste0("Results contain ",total_pages," total pages of results.  Proceed?"))
+    if (total_pages>1) { 
+      #menu(c("Yes","No"), title = paste0("Results contain ",total_pages," total pages of results.  Proceed?"))
+      for(i in 1:total_pages){
+        tryCatch({
+        cat('Downloading page', i, 'of', total_pages,'\n')
+        call1 <- paste0("http://api.buzzsumo.com/search/influencers.json?q=",q,"&persontypes=",person_type,"&api_key=NgK4A4Q0Vs4a61z0mL8DpN00kuo9b0A8&page=",i,, sep="")
+        get_call <- GET(call1)
+        get_content = content(get_call, "text")
+        get_content_json = fromJSON(get_content, flatten = TRUE)
+        res = as.data.frame(get_content_json$results)
+        temp = plyr::rbind.fill(temp, res)}, error=function(e){})
+      }
+    }
+  }
+  #temp$published_date = as.Date(as.POSIXct(temp$published_date, origin="1970-01-01"), format = "%d/%m/%Y")
+  temp = unique(temp)
+  temp
+}
+
+#Example:
+#accounts = getArticleSharers_test$username
+#accounts = accounts[1:10]
+#test = getInfluencers("baby powder","journalist, blogger")
