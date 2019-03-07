@@ -1,1 +1,1 @@
-Folder for buzzsumo toolkit R package.
+I have just posted the functions here instead of making a package due to dependency weirdness.  We will likely need to build a Docker, but that will have to wait.
