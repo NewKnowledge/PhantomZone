@@ -9,15 +9,15 @@ getMostShared = function(q, num_days, lang, art_type){
   if(missing(q)){
     stop("Please enter a search term")
   }
-  
+
   if(missing(num_days)){
     stop("Please enter the number of days for which you wish to search")
   }
-  
+
   if(missing(art_type)){
     stop("Please enter the type of article you wish to search")
   }
-  
+
   if(missing(lang)){
     stop("Please enter the language for content which you wish to search")
   }
@@ -33,7 +33,7 @@ getMostShared = function(q, num_days, lang, art_type){
     print("No Results")
   } else {
   #Loop to download multiple pages
-      if (total_pages>1) { 
+      if (total_pages>1) {
         #menu(c("Yes","No"), title = paste0("Results contain ",total_pages," total pages of results.  Proceed?"))
      for(i in 1:total_pages){
        cat('Downloading page', i, 'of', total_pages,'\n')
@@ -42,6 +42,7 @@ getMostShared = function(q, num_days, lang, art_type){
         get_content = content(get_call, "text")
         get_content_json = fromJSON(get_content, flatten = TRUE)
         res = as.data.frame(get_content_json$results)
+        Sys.sleep(1)
         temp = plyr::rbind.fill(temp, res)}
      }
   }
@@ -49,9 +50,9 @@ getMostShared = function(q, num_days, lang, art_type){
   temp$published_date = as.Date(as.POSIXct(temp$published_date, origin="1970-01-01"), format = "%d/%m/%Y")
   temp = temp[ , -which(names(temp) %in% c("article_amplifiers","article_types"))]
   temp=unique(temp)}
+  Sys.sleep(1)
   temp
 }
-
 #Example
 #getShared_test = getMostShared(q="captain marvel",  lang="en", num_days = "10", art_type = "general_article,video,list,how_to_article,what_post,why_post,infographic")
 
